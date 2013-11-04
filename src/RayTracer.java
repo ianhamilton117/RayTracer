@@ -10,6 +10,7 @@ import java.util.Scanner;
 import Jama.Matrix;
 
 
+
 public class RayTracer {
 	
 	public static LinkedList<Sphere> spheres = new LinkedList<Sphere>();
