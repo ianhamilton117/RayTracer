@@ -1,0 +1,5 @@
+To run code, type:
+		javac *.java
+		java RayTracer <object_file> <command_file>
+		
+The .ppm files will be generated in the current directory.
