@@ -42,9 +42,9 @@ public class RayTracer {
 		Scanner commandIn = null;
 		try {
 			commandIn = new Scanner(commandFile);
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e2) {
 			System.err.println("Could not find command file");
-//			e.printStackTrace();
+//			e2.printStackTrace();
 			return;
 		}
 		LinkedList<String> commandFileLines = new LinkedList<String>();
@@ -87,9 +87,12 @@ public class RayTracer {
 						double vpn_x = in.nextDouble();
 						double vpn_y = in.nextDouble();
 						double vpn_z = in.nextDouble();
+						double vup_x = in.nextDouble();
+						double vup_y = in.nextDouble();
+						double vup_z = in.nextDouble();
 						double near = in.nextDouble();
 						double far = in.nextDouble();
-						Camera camera = new Camera(cameraName, prp_x, prp_y, prp_z, vpn_x, vpn_y, vpn_z, near,far);
+						Camera camera = new Camera(cameraName, prp_x, prp_y, prp_z, vpn_x, vpn_y, vpn_z, vup_x, vup_y, vup_z, near,far);
 						cameras.add(camera);
 						break;
 						

@@ -57,6 +57,33 @@ public class Vector {
 		return new Vector(this.x + vect.x, this.y + vect.y, this.z + vect.z, 0);
 	}
 	
+	public void setVals(double[][] array) {
+		try {
+			x = array[0][0];
+			y = array[1][0];
+			z = array[2][0];
+			w = array[3][0];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.err.println("Array not the right size");
+			e.printStackTrace();
+		}
+	}
+	
+	public double[][] toArrayVert() {
+		double[][] ret = {{x},{y},{z},{w}};
+		return ret;
+	}
+	
+	public double[][] toArrayHoriz() {
+		double[][] ret = {{x,y,z,w}};
+		return ret;
+	}
+	
+	public double[] to1DArray() {
+		double[] ret = {x,y,z,w};
+		return ret;
+	}
+	
 	public String toString() {
 		String out = ("(" + Double.toString(x) + "," + Double.toString(y) + "," + Double.toString(z) + ")");
 		return out;

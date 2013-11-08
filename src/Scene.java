@@ -1,3 +1,5 @@
+import Jama.Matrix;
+
 public class Scene {
 	
 	String name;
@@ -36,11 +38,27 @@ public class Scene {
 	}
 	
 	private void initializeImagePlane(Camera camera) {
+		// First, place prp at origin with vpn pointing down -z axis
 		double width = 2.0 / (image_width-1); // The distance between each pixel in the x direction.
 		double height = 2.0 / (image_height-1); // The distance between each pixel in the y direction.
 		for (int j = 0; j < image_height; ++j) {
 			for (int i = 0; i < image_width; ++i) {
 				imagePlane[i][j] = new Vector(-1 + width * i, 1 - height * j, -camera.near);
+			}
+		}
+		
+		// Then, rotate and translate
+		double[][] translate = {{1,0,0,-camera.prp.x},{0,1,0,-camera.prp.y},{0,0,1,-camera.prp.z},{0,0,0,1}}; // TODO Translation is reversed
+		Matrix T = new Matrix(translate);
+//		Vector
+		double[][] rotate = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+		Matrix R = new Matrix(rotate);
+		Matrix transform = R.times(T);
+		transform.print(5, 2);
+		for (int j = 0; j < image_height; ++j) {
+			for (int i = 0; i < image_width; ++i) {
+				Matrix pixel = new Matrix(imagePlane[i][j].toArrayVert());
+				imagePlane[i][j].setVals(transform.times(pixel).getArray());
 			}
 		}
 	}
