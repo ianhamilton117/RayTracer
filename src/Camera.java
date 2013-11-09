@@ -13,8 +13,13 @@ public class Camera {
 		prp = new Vector(prp_x, prp_y, prp_z, 1);
 		vpn = new Vector(vpn_x, vpn_y, vpn_z);
 		vpn = vpn.normalize();
+		lookAt(new Vector(1, -1, -8));	// For testing. Comment out for regular use.		// TODO WHY IS THIS SWITCHED??? (should be -1, 1, -8)
 		vup = new Vector(vup_x, vup_y, vup_z);
 		near = nearArg;
 		far = farArg;
+	}
+	
+	private void lookAt(Vector lookAt) {
+		vpn = prp.minus(lookAt).normalize();	// TODO Only works from origin
 	}
 }

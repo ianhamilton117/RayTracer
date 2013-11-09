@@ -31,6 +31,14 @@ public class Vector {
 		return a + b + c;
 	}
 	
+	//Computes the cross product
+	public Vector cross(Vector vect) {
+		double xNew = this.y*vect.z - this.z*vect.y;
+		double yNew = this.z*vect.x - this.x*vect.z;
+		double zNew = this.x*vect.y - this.y*vect.x;
+		return new Vector(xNew, yNew, zNew);
+	}
+	
 	//Returns a normalized version of itself
 	public Vector normalize() {
 		
