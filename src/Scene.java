@@ -51,7 +51,7 @@ public class Scene {
 		double[][] translate = {{1,0,0,-camera.prp.x},{0,1,0,-camera.prp.y},{0,0,1,-camera.prp.z},{0,0,0,1}}; // TODO Translation is reversed
 		Matrix T = new Matrix(translate);
 		Vector n = camera.vpn;
-		Vector u = camera.vup.cross(n).normalize();
+		Vector u = (camera.vup.cross(n)).normalize();
 		Vector v = n.cross(u);
 		double[][] rotate = {u.to1DArray(),v.to1DArray(),n.to1DArray(),{0,0,0,1}};
 		Matrix R = new Matrix(rotate);

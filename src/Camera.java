@@ -20,6 +20,6 @@ public class Camera {
 	}
 	
 	private void lookAt(Vector lookAt) {
-		vpn = prp.minus(lookAt).normalize();	// TODO Only works from origin
+		vpn = (prp.minus(lookAt)).normalize();	// TODO Only works from origin
 	}
 }
