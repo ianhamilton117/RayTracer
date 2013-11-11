@@ -92,8 +92,13 @@ public class Vector {
 		return ret;
 	}
 	
+	public void isNormalized() {
+		if (w != 1)
+			System.out.println("Not normalized)");
+	}
+	
 	public String toString() {
-		String out = ("(" + Double.toString(x) + "," + Double.toString(y) + "," + Double.toString(z) + ")");
+		String out = ("(" + Double.toString(x) + "," + Double.toString(y) + "," + Double.toString(z) + "," + Double.toString(w) + ")");
 		return out;
 	}
 	

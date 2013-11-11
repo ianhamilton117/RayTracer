@@ -1,5 +1,6 @@
 #Camera specifications
-c cam00 0 0 0 0 0 1 0 1 0 1 20
-c cam01 0 0 0 0 0 1 0 1 0 8 15
+#          prp       vpn       vup     n  f
+c cam00  0  0  0   1  0  0   0  0  1   4 18
+c cam01  0  0  0  -1  0  0   1  1  1   4 18
 #ray cast command
 r scene_01 512 512 1

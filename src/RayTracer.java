@@ -144,6 +144,7 @@ public class RayTracer {
 			write(depthMap, depthFile);
 			}
 		}
+		System.out.println("Done");
 	}
 	
 }
