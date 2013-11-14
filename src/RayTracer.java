@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 import Jama.Matrix;
@@ -13,12 +14,15 @@ import Jama.Matrix;
 
 public class RayTracer {
 	
-	public static LinkedList<Sphere> spheres = new LinkedList<Sphere>();
+	public static ArrayList<Sphere> spheres = new ArrayList<Sphere>();
 	public static LinkedList<Camera> cameras = new LinkedList<Camera>();
 	public static LinkedList<Scene> scenes = new LinkedList<Scene>();
+	public static ArrayList<Vector> vertices = new ArrayList<Vector>();
+	public static ArrayList<Group> groups = new ArrayList<Group>();
+	public static LinkedList<Material> materials = new LinkedList<Material>();
 	
 	//Takes an object input file and a command input file, puts the lines of each into a LinkedList<String>
-	//and hands them off to parse2. No error checking.
+	//and hands them off to other methods. No error checking.
 	static void parse(String objectFileName, String commandFileName) {
 		
 		File objectFile = new File(objectFileName);
@@ -36,6 +40,7 @@ public class RayTracer {
 				objectFileLines.add(line);
 		}
 		objectIn.close();
+		vertices.add(new Vector(0, 0, 0, 0));  // Dummy vertex so that list starts at index 1
 		parseHelper(objectFileLines);
 		
 		File commandFile = new File(commandFileName);
@@ -57,6 +62,76 @@ public class RayTracer {
 		parseHelper(commandFileLines);
 		
 	}
+	
+	// Reads vertices from object file
+	static void objectFilePassOne(LinkedList<String> input) {
+		
+		for (int i=0; i < input.size(); i++) {
+			Scanner in = new Scanner(input.get(i));
+			String type = in.next();
+			switch (type) {
+			
+			case "v":	double x = in.nextDouble();
+						double y = in.nextDouble();
+						double z = in.nextDouble();
+						double w;
+						if (in.hasNextDouble())
+							w = in.nextDouble();
+						else
+							w = 1;
+						vertices.add(new Vector(x, y, z, w));
+						break;
+						
+			default:	break;
+			}
+			in.close();
+		}
+	}
+	
+	// Reads faces, groups, and spheres from object file
+	static void objectFilePassTwo(LinkedList<String> input) {
+		groups.add(new Group("default"));
+		Group currentGroup = groups.get(groups.size()-1);
+		Material currentMaterial = null;
+		for (int i=0; i < input.size(); i++) {
+			Scanner in = new Scanner(input.get(i));
+			String type = in.next();
+			switch (type) {
+			
+			case "usemtl":	String mtlName = in.next();
+							int mtlIndex = findMtl(mtlName);
+							if (mtlIndex == -1)
+								System.out.println("Error: Could not find material: " + mtlName);
+							currentMaterial = materials.get(mtlIndex);
+							break;
+							what do the other material values default to?
+			
+			case "f":	ArrayList<Vector> points = new ArrayList<Vector>();
+						while (in.hasNextInt())
+							points.add(vertices.get(in.nextInt()));
+						currentGroup.addFace(new Face(points, currentMaterial));
+						break;
+						
+			case start here
+			
+			}
+			in.close();
+		}
+	}
+	
+	// Reads camera specs, light sources, and ray cast commands from command file
+	static void commandFileParse(LinkedList<String> input) {
+		
+	}
+	
+	static int findMtl(String name) {
+		for (int i=0; i<materials.size(); ++i) {
+			if (name.compareTo(materials.get(i).name) == 0)
+				return i;
+		}
+		return -1;
+	}
+
 	
 	//Takes a LinkedList<String> containing object information and adds objects, 
 	//cameras, and scenes to global lists. No error checking on String formatting.
@@ -104,7 +179,7 @@ public class RayTracer {
 						scenes.add(scene);
 						break;
 						
-			default: break;
+			default: 	break;
 			
 			}
 			in.close();
