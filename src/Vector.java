@@ -15,12 +15,25 @@ public class Vector {
 		w = wArg;
 	}
 	
+	// Copy constructor
+	public Vector(Vector orig) {
+		x = orig.x;
+		y = orig.y;
+		z = orig.z;
+		w = orig.w;
+	}
+	
 	//If not specified, w defaults to 0.
 	public Vector(double xArg, double yArg, double zArg) {
 		x = xArg;
 		y = yArg;
 		z = zArg;
 		w = 0;
+	}
+	
+	// Multiplies by a scalar
+	public Vector times(double num) {
+		return new Vector(this.x*num, this.y*num, this.z*num, this.w);	// Does not change value of w
 	}
 	
 	//Computes the dot product

@@ -4,12 +4,14 @@ public class Ray {
 	
 	Vector direction;
 	Vector origin;
+	Vector prp;
 	double pixelToPrpDist;
 	double near;
 	double far;
 	private static final int MAX_RGB_VALUE = 255;
 
 	public Ray(Vector prp, Vector pixel, double nearArg, double farArg) {
+		this.prp = prp;
 		direction = (pixel.minus(prp)).normalize();
 		origin = pixel;
 		pixelToPrpDist = (pixel.minus(prp)).length();
@@ -23,8 +25,9 @@ public class Ray {
 		double nearestIntersection = far;
 		for (int i = 0; i < RayTracer.spheres.size(); ++i) {
 			Sphere sphere = RayTracer.spheres.get(i);
-			double v = sphere.center.dot(direction);
-			double c = sphere.center.length();
+			Vector sphereCenter = new Vector(sphere.center.minus(prp));
+			double v = sphereCenter.dot(direction);
+			double c = sphereCenter.length();
 			double b = Math.sqrt(c*c - v*v);
 			double r = sphere.radius;
 			if (b <= r) {

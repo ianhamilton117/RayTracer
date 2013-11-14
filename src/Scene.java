@@ -38,35 +38,23 @@ public class Scene {
 	}
 	
 	private void initializeImagePlane(Camera camera) {
-		// First, place prp at origin with vpn pointing down -z axis
-		double width = 2.0 / (image_width-1); // The distance between each pixel in the x direction.
-		double height = 2.0 / (image_height-1); // The distance between each pixel in the y direction.
-		for (int j = 0; j < image_height; ++j) {
-			for (int i = 0; i < image_width; ++i) {
-				imagePlane[i][j] = new Vector(-1 + width * i, 1 - height * j, -camera.near, 1);
-			}
-		}
 		
-		// Then, rotate and translate
-		double[][] T_array = {{1,0,0,-camera.prp.x},{0,1,0,-camera.prp.y},{0,0,1,-camera.prp.z},{0,0,0,1}}; // TODO Translation is reversed
-		Matrix T = new Matrix(T_array);
-		Vector n = camera.vpn;
+		Vector n = new Vector(camera.vpn);
 		Vector u = (camera.vup.cross(n)).normalize();
 		Vector v = n.cross(u);
-		double[][] R_array = {u.to1DArray(),v.to1DArray(),n.to1DArray(),{0,0,0,1}};
-		Matrix R = new Matrix(R_array);
-		Matrix transformationMatrix = R.times(T);		// Should be T.times(R) ?
-//		T.print(5, 2);
-//		R.print(5, 2);
-		transformationMatrix.print(5, 2);
+		Vector topLeft = new Vector(camera.prp);	// topLeft will specify the location of the top left corner of the image plane.
+		topLeft = topLeft.minus(camera.vpn.times(camera.near));	// Move to center of image plane
+		topLeft = topLeft.minus(u);	// Move to u = -1 (left) edge of image plane
+		topLeft = topLeft.plus(v);	// Move to v = +1 (top) edge of image plane
+		double pixWidth = 2.0 / (image_width-1); // The distance between each pixel in the horizontal (u) direction.
+		double pixHeight = 2.0 / (image_height-1); // The distance between each pixel in the vertical (v) direction.
 		for (int j = 0; j < image_height; ++j) {
 			for (int i = 0; i < image_width; ++i) {
-				Matrix pixel = new Matrix(imagePlane[i][j].toArrayVert());
-				imagePlane[i][j].setVals(transformationMatrix.times(pixel).getArray());
-//				imagePlane[i][j] = imagePlane[i][j].normalize();
-				imagePlane[i][j].isNormalized();
+				imagePlane[i][j] = new Vector(topLeft.plus(u.times(pixWidth*i)).minus(v.times(pixHeight*j)));
+				imagePlane[i][j].w = 1;
 			}
 		}
+
 	}
 	
 	public Color[][] getColorMap() {
