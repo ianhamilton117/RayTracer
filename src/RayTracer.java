@@ -40,8 +40,8 @@ public class RayTracer {
 				objectFileLines.add(line);
 		}
 		objectIn.close();
-		vertices.add(new Vector(0, 0, 0, 0));  // Dummy vertex so that list starts at index 1
-		parseHelper(objectFileLines);
+		objectFilePassOne(objectFileLines);
+		objectFilePassTwo(objectFileLines);
 		
 		File commandFile = new File(commandFileName);
 		Scanner commandIn = null;
@@ -67,6 +67,7 @@ public class RayTracer {
 	static void objectFilePassOne(LinkedList<String> input) {
 		
 		for (int i=0; i < input.size(); i++) {
+			vertices.add(new Vector(0, 0, 0, 0));  // Dummy vertex so that list starts at index 1
 			Scanner in = new Scanner(input.get(i));
 			String type = in.next();
 			switch (type) {
@@ -98,13 +99,30 @@ public class RayTracer {
 			String type = in.next();
 			switch (type) {
 			
+			case "mtllib":	File materialFile = new File(in.next());
+							Scanner materialIn = null;
+							try {
+								materialIn = new Scanner(materialFile);
+							} catch (FileNotFoundException e1) {
+								System.err.println("Could not find material file");
+//								e1.printStackTrace();
+							}
+							LinkedList<String> materialFileLines = new LinkedList<String>();
+							while (materialIn.hasNextLine()) {
+								String line = materialIn.nextLine();
+								if (!line.trim().isEmpty())
+									materialFileLines.add(line);
+							}
+							materialIn.close();
+							materialFileParse(materialFileLines);
+							
+			
 			case "usemtl":	String mtlName = in.next();
 							int mtlIndex = findMtl(mtlName);
 							if (mtlIndex == -1)
 								System.out.println("Error: Could not find material: " + mtlName);
 							currentMaterial = materials.get(mtlIndex);
 							break;
-							what do the other material values default to?
 			
 			case "f":	ArrayList<Vector> points = new ArrayList<Vector>();
 						while (in.hasNextInt())
@@ -112,8 +130,19 @@ public class RayTracer {
 						currentGroup.addFace(new Face(points, currentMaterial));
 						break;
 						
-			case start here
+			case "g":	groups.add(new Group(in.next()));
+						currentGroup = groups.get(groups.size()-1);
+						// TODO If the group already exists, use that one rather than creating a new one?
+						break;
 			
+			case "s":	String sphereName = in.next();
+						double x = in.nextDouble();
+						double y = in.nextDouble();
+						double z = in.nextDouble();
+						double radius = in.nextDouble();
+						Sphere sphere = new Sphere(sphereName, x, y, z, radius, currentMaterial);
+						spheres.add(sphere);
+						break;
 			}
 			in.close();
 		}
@@ -122,6 +151,10 @@ public class RayTracer {
 	// Reads camera specs, light sources, and ray cast commands from command file
 	static void commandFileParse(LinkedList<String> input) {
 		
+	}
+	
+	static void materialFileParse(LinkedList<String> input) {
+		left off here
 	}
 	
 	static int findMtl(String name) {
