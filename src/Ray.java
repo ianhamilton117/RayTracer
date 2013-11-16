@@ -25,9 +25,9 @@ public class Ray {
 		double nearestIntersection = far;
 		for (int i = 0; i < RayTracer.spheres.size(); ++i) {
 			Sphere sphere = RayTracer.spheres.get(i);
-			Vector sphereCenter = new Vector(sphere.center.minus(prp));
-			double v = sphereCenter.dot(direction);
-			double c = sphereCenter.length();
+			Vector prpToSphereCenter = new Vector(sphere.center.minus(prp));
+			double v = prpToSphereCenter.dot(direction);
+			double c = prpToSphereCenter.length();
 			double b = Math.sqrt(c*c - v*v);
 			double r = sphere.radius;
 			if (b <= r) {
@@ -35,11 +35,29 @@ public class Ray {
 				double intersection = v-d;
 				if (intersection >= pixelToPrpDist && intersection < nearestIntersection) {
 					nearestIntersection = intersection;
-					color.set(new Color());
+					Vector Q = prp.plus(direction.times(v-d));  // World coordinates where ray intersects sphere
+					setColor(color, sphere, Q);
 					depth.setAll((int)Math.round(MAX_RGB_VALUE * (1 - (intersection-pixelToPrpDist)/(far-near))));	// Corrected for distance from prp to image plane
 				}
 			}
 		}		
+	}
+	
+	private void setColor(Color sphereColor, Sphere sphere, Vector intersection) {
+		// Ambient
+		Color ambient = new Color(RayTracer.lights.get(0).color.times(sphere.material.Ka));
+		
+		// Diffuse
+		Color diffuse = new Color();
+		Vector surfaceNormal = (intersection.minus(sphere.center)).normalize();
+		for (int i=1; i<RayTracer.lights.size(); ++i) {
+			Vector incomingLightRay = (RayTracer.lights.get(i).position.minus(intersection)).normalize();
+			if(surfaceNormal.dot(incomingLightRay) > 0) {
+				diffuse = diffuse.add((RayTracer.lights.get(i).color.times(sphere.material.Kd)).times(surfaceNormal.dot(incomingLightRay)));
+				System.out.println(surfaceNormal.dot(incomingLightRay));
+			}
+		}
+		sphereColor.set(ambient.add(diffuse));
 	}
 				
 }
