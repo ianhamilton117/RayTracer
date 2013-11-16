@@ -16,10 +16,27 @@ public class RayTracer {
 	
 	public static ArrayList<Sphere> spheres = new ArrayList<Sphere>();
 	public static LinkedList<Camera> cameras = new LinkedList<Camera>();
+	public static LinkedList<Light> lights = new LinkedList<Light>();
 	public static LinkedList<Scene> scenes = new LinkedList<Scene>();
 	public static ArrayList<Vector> vertices = new ArrayList<Vector>();
 	public static ArrayList<Group> groups = new ArrayList<Group>();
 	public static LinkedList<Material> materials = new LinkedList<Material>();
+	
+	public static void main(String[] args) throws IOException {
+		parse(args[0], args[1]);
+		for (int s = 0; s < scenes.size(); ++s) {
+			for (int c = 0; c < cameras.size(); ++c) {
+			scenes.get(s).renderScene(cameras.get(c));
+			Color[][] colorMap = scenes.get(s).getColorMap();
+			Color[][] depthMap = scenes.get(s).getDepthMap();
+			String colorFile = (scenes.get(s).name + "_" + cameras.get(c).name + "_color.ppm");
+			String depthFile = (scenes.get(s).name + "_" + cameras.get(c).name + "_depth.ppm");
+			write(colorMap, colorFile);
+			write(depthMap, depthFile);
+			}
+		}
+		System.out.println("Done");
+	}
 	
 	//Takes an object input file and a command input file, puts the lines of each into a LinkedList<String>
 	//and hands them off to other methods. No error checking.
@@ -33,6 +50,7 @@ public class RayTracer {
 			System.err.println("Could not find object file");
 //			e1.printStackTrace();
 		}
+		String commandFilePath = objectFileName.substring(0, objectFileName.lastIndexOf('/')+1);  // Chops off command file name while leaving path
 		LinkedList<String> objectFileLines = new LinkedList<String>();
 		while (objectIn.hasNextLine()) {
 			String line = objectIn.nextLine();
@@ -41,7 +59,7 @@ public class RayTracer {
 		}
 		objectIn.close();
 		objectFilePassOne(objectFileLines);
-		objectFilePassTwo(objectFileLines);
+		objectFilePassTwo(objectFileLines, commandFilePath);
 		
 		File commandFile = new File(commandFileName);
 		Scanner commandIn = null;
@@ -59,15 +77,15 @@ public class RayTracer {
 				commandFileLines.add(line);
 		}
 		commandIn.close();
-		parseHelper(commandFileLines);
+		commandFileParse(commandFileLines);
 		
 	}
 	
 	// Reads vertices from object file
 	static void objectFilePassOne(LinkedList<String> input) {
-		
+		vertices.add(new Vector(0, 0, 0, 0));  // Dummy vertex so that list starts at index 1
+
 		for (int i=0; i < input.size(); i++) {
-			vertices.add(new Vector(0, 0, 0, 0));  // Dummy vertex so that list starts at index 1
 			Scanner in = new Scanner(input.get(i));
 			String type = in.next();
 			switch (type) {
@@ -90,7 +108,7 @@ public class RayTracer {
 	}
 	
 	// Reads faces, groups, and spheres from object file
-	static void objectFilePassTwo(LinkedList<String> input) {
+	static void objectFilePassTwo(LinkedList<String> input, String mtlPath) {
 		groups.add(new Group("default"));
 		Group currentGroup = groups.get(groups.size()-1);
 		Material currentMaterial = null;
@@ -99,7 +117,7 @@ public class RayTracer {
 			String type = in.next();
 			switch (type) {
 			
-			case "mtllib":	File materialFile = new File(in.next());
+			case "mtllib":	File materialFile = new File(mtlPath + in.next());
 							Scanner materialIn = null;
 							try {
 								materialIn = new Scanner(materialFile);
@@ -115,6 +133,7 @@ public class RayTracer {
 							}
 							materialIn.close();
 							materialFileParse(materialFileLines);
+							break;
 							
 			
 			case "usemtl":	String mtlName = in.next();
@@ -143,6 +162,8 @@ public class RayTracer {
 						Sphere sphere = new Sphere(sphereName, x, y, z, radius, currentMaterial);
 						spheres.add(sphere);
 						break;
+						
+			default:	break;
 			}
 			in.close();
 		}
@@ -150,11 +171,107 @@ public class RayTracer {
 	
 	// Reads camera specs, light sources, and ray cast commands from command file
 	static void commandFileParse(LinkedList<String> input) {
-		
+		lights.add(new Light(0, 0, 0, 0, 20, 20, 20));  // The first light is the ambient light
+		for (int i=0; i < input.size(); i++) {
+			Scanner in = new Scanner(input.get(i));
+			String type = in.next();
+			switch (type) {
+			
+			case "c":	String cameraName = in.next();
+						double prp_x = in.nextDouble();
+						double prp_y = in.nextDouble();
+						double prp_z = in.nextDouble();
+						double vpn_x = in.nextDouble();
+						double vpn_y = in.nextDouble();
+						double vpn_z = in.nextDouble();
+						double vup_x = in.nextDouble();
+						double vup_y = in.nextDouble();
+						double vup_z = in.nextDouble();
+						double near = in.nextDouble();
+						double far = in.nextDouble();
+						Camera camera = new Camera(cameraName, prp_x, prp_y, prp_z, vpn_x, vpn_y, vpn_z, vup_x, vup_y, vup_z, near,far);
+						cameras.add(camera);
+						break;
+
+			case "l":	double x = in.nextDouble();
+						double y = in.nextDouble();
+						double z = in.nextDouble();
+						double w = in.nextDouble();
+						int r = in.nextInt();
+						int g = in.nextInt();
+						int b = in.nextInt();
+						lights.add(new Light(x, y, z, w, r, g, b));
+						break;
+			
+			case "r":	String sceneName = in.next();
+						int width = in.nextInt();
+						int height = in.nextInt();
+						int recursion_depth = in.nextInt();
+						Scene scene = new Scene(sceneName, width, height, recursion_depth);
+						scenes.add(scene);
+						break;
+			}
+			in.close();
+		}
 	}
 	
 	static void materialFileParse(LinkedList<String> input) {
-		left off here
+		Material currentMaterial = null;
+		double r;
+		double g;
+		double b;
+		for (int i=0; i < input.size(); i++) {
+			Scanner in = new Scanner(input.get(i));
+			String type = in.next();
+			switch (type) {
+			
+			case "newmtl":	materials.add(new Material(in.next()));
+							currentMaterial = materials.getLast();
+							break;
+			
+			case "Ka":		r = in.nextDouble();
+							g = in.nextDouble();
+							b = in.nextDouble();
+							currentMaterial.setKa(r, g, b);
+							break;
+							
+			case "Kd":		r = in.nextDouble();
+							g = in.nextDouble();
+							b = in.nextDouble();
+							currentMaterial.setKd(r, g, b);
+							break;
+							
+			case "Ks":		r = in.nextDouble();
+							g = in.nextDouble();
+							b = in.nextDouble();
+							currentMaterial.setKs(r, g, b);
+							break;
+							
+			case "Ns":		double Ns = in.nextDouble();
+							currentMaterial.Ns = Ns;
+							break;
+							
+			case "n1":		double n1 = in.nextDouble();
+							currentMaterial.n1 = n1;
+							break;
+							
+			case "Tr":		double Tr = in.nextDouble();
+							currentMaterial.Tr = Tr;
+							break;
+							
+			case "Kr":		double Kr = in.nextDouble();
+							currentMaterial.Kr = Kr;
+							break;
+							
+			case "Krf":		double Krf = in.nextDouble();
+							currentMaterial.Krf = Krf;
+							break;
+							
+			default:		break;
+			
+			}
+			in.close();
+		}
 	}
 	
 	static int findMtl(String name) {
@@ -166,14 +283,13 @@ public class RayTracer {
 	}
 
 	
-	//Takes a LinkedList<String> containing object information and adds objects, 
+/*	//Takes a LinkedList<String> containing object information and adds objects, 
 	//cameras, and scenes to global lists. No error checking on String formatting.
 	static void parseHelper(LinkedList<String> input) {
 		
 		for (int i=0; i < input.size(); i++) {
 			Scanner in = new Scanner(input.get(i));
 			String type = in.next();
-			//switch statement used so that more types of objects can be added later.
 			switch (type) {
 			
 			case "s":	String sphereName = in.next();
@@ -218,7 +334,7 @@ public class RayTracer {
 			in.close();
 		}
 		
-	}
+	}*/
 	
 	static void write(Color[][] map, String fileName) {
 		try {
@@ -239,20 +355,41 @@ public class RayTracer {
 		}
 	}
 	
-	public static void main(String[] args) throws IOException {
-		parse(args[0], args[1]);
-		for (int s = 0; s < scenes.size(); ++s) {
-			for (int c = 0; c < cameras.size(); ++c) {
-			scenes.get(s).renderScene(cameras.get(c));
-			Color[][] colorMap = scenes.get(s).getColorMap();
-			Color[][] depthMap = scenes.get(s).getDepthMap();
-			String colorFile = (scenes.get(s).name + "_" + cameras.get(c).name + "_color.ppm");
-			String depthFile = (scenes.get(s).name + "_" + cameras.get(c).name + "_depth.ppm");
-			write(colorMap, colorFile);
-			write(depthMap, depthFile);
-			}
-		}
-		System.out.println("Done");
+	static void printAllGlobals() {		
+		System.out.println("Spheres:");
+		for(int i=0; i<spheres.size(); ++i)
+			System.out.println(spheres.get(i));
+		System.out.println();
+		
+		System.out.println("Vertices:");
+		for(int i=0; i<vertices.size(); ++i)
+			System.out.println(vertices.get(i));
+		System.out.println();
+		
+		System.out.println("Groups:");
+		for(int i=0; i<groups.size(); ++i)
+			System.out.println(groups.get(i));
+		System.out.println();
+		
+		System.out.println("Materials:");
+		for(int i=0; i<materials.size(); ++i)
+			System.out.println(materials.get(i));
+		System.out.println();
+		
+		System.out.println("Cameras:");
+		for(int i=0; i<cameras.size(); ++i)
+			System.out.println(cameras.get(i).name);
+		System.out.println();
+		
+		System.out.println("Lights:");
+		for(int i=0; i<lights.size(); ++i)
+			System.out.println(lights.get(i));
+		System.out.println();
+		
+		System.out.println("Scenes:");
+		for(int i=0; i<scenes.size(); ++i)
+			System.out.println(scenes.get(i).name);
+		System.out.println();
 	}
 	
 }

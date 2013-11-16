@@ -35,7 +35,7 @@ public class Ray {
 				double intersection = v-d;
 				if (intersection >= pixelToPrpDist && intersection < nearestIntersection) {
 					nearestIntersection = intersection;
-					color.set(sphere.color);
+					color.set(new Color());
 					depth.setAll((int)Math.round(MAX_RGB_VALUE * (1 - (intersection-pixelToPrpDist)/(far-near))));	// Corrected for distance from prp to image plane
 				}
 			}

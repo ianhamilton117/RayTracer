@@ -11,5 +11,9 @@ public class Sphere {
 		radius = radiusArg;
 		mtl = mtlArg;
 	}
+	
+	public String toString() {
+		return new String(name + "\nCenter: " + center + "\nRadius: " + radius + "\nMaterial: " + mtl.name);
+	}
 
 }
