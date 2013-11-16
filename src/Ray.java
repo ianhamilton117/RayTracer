@@ -47,17 +47,22 @@ public class Ray {
 		// Ambient
 		Color ambient = new Color(RayTracer.lights.get(0).color.times(sphere.material.Ka));
 		
-		// Diffuse
+		// Diffuse and specular
 		Color diffuse = new Color();
-		Vector surfaceNormal = (intersection.minus(sphere.center)).normalize();
+		Color specular = new Color();
+		Vector surfaceNormal = (intersection.minus(sphere.center)).normalize();  // N in slides
+		Vector directionToCamera = (prp.minus(intersection)).normalize();  // V in slides
 		for (int i=1; i<RayTracer.lights.size(); ++i) {
-			Vector incomingLightRay = (RayTracer.lights.get(i).position.minus(intersection)).normalize();
-			if(surfaceNormal.dot(incomingLightRay) > 0) {
-				diffuse = diffuse.add((RayTracer.lights.get(i).color.times(sphere.material.Kd)).times(surfaceNormal.dot(incomingLightRay)));
-				System.out.println(surfaceNormal.dot(incomingLightRay));
+			Vector directionToLight = (RayTracer.lights.get(i).position.minus(intersection)).normalize();  // L in slides
+			Vector directionOfReflectedRay = ((surfaceNormal.times(2*(directionToLight.dot(surfaceNormal)))).minus(directionToLight)).normalize();  // R in slides
+			if (surfaceNormal.dot(directionToLight) > 0) {
+				diffuse = diffuse.add((RayTracer.lights.get(i).color.times(sphere.material.Kd)).times(surfaceNormal.dot(directionToLight)));
+			}
+			if (directionToCamera.dot(directionOfReflectedRay) > 0) {
+				specular = specular.add((RayTracer.lights.get(i).color.times(sphere.material.Ks)).times(Math.pow(directionToCamera.dot(directionOfReflectedRay), sphere.material.Ns)));
 			}
 		}
-		sphereColor.set(ambient.add(diffuse));
+		sphereColor.set(ambient.add(diffuse).add(specular));
 	}
 				
 }
