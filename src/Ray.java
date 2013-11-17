@@ -1,4 +1,5 @@
 import java.lang.Math;
+import Jama.Matrix;
 
 public class Ray {
 	
@@ -56,6 +57,42 @@ public class Ray {
 				}
 			}
 		}
+		
+		double nearestTriangleIntersection = -1;
+		Face triangleFinal = null;
+		for (int i=0; i<RayTracer.groups.size(); ++i) {
+			Group group = RayTracer.groups.get(i);
+			for (int j=0; j<group.faces.size(); ++j) {
+				Face face = group.faces.get(j);
+				for (int k=0; k<face.triangles.size(); ++k) {
+					Face triangle = face.triangles.get(k);
+					double t = -((triangle.normal).dot(origin) + triangle.d) / (triangle.normal).dot(direction);
+					double[][] array1 = {{triangle.A.x, triangle.B.x, -direction.x},
+							             {triangle.A.y, triangle.B.y, -direction.y},
+							             {triangle.A.z, triangle.B.z, -direction.z}};
+					double[][] array2 = {{origin.x - triangle.points.get(1).x},
+							             {origin.y - triangle.points.get(1).y},
+							             {origin.z - triangle.points.get(1).z}};
+					Matrix matrix1 = new Matrix(array1);
+					Matrix matrix2 = new Matrix(array2);
+					try {
+						Matrix result = matrix1.inverse().times(matrix2);
+						double insideCheck = result.get(0, 0) + result.get(1, 0);
+						if (insideCheck <= 1 && insideCheck > 0) {
+							double intersection = t;
+							if (intersection >= pixelToPrpDist && (intersection < nearestTriangleIntersection || nearestTriangleIntersection == -1)) {
+								nearestTriangleIntersection = intersection;
+								triangleFinal = triangle;
+								color.setAll(150);
+							}
+						}
+					} catch (RuntimeException e) {
+//						System.err.println("Singular matrix");
+					}
+				}
+			}
+		}
+		
 		if (nearestSphereIntersection != -1 && (near != 0 || far != 0)) {  // Don't enter if() if it's a shadow checker
 			Vector Q = prp.plus(direction.times(vFinal-dFinal));  // World coordinates where ray intersects sphere
 			setColor(color, sphereFinal, Q);
@@ -76,8 +113,9 @@ public class Ray {
 		for (int i=1; i<RayTracer.lights.size(); ++i) {
 			double distanceToLight = RayTracer.lights.get(i).position.minus(intersection).length();
 			Vector directionToLight = (RayTracer.lights.get(i).position.minus(intersection)).normalize();  // L in slides
-//			Ray shadowCheck = new Ray(intersection, directionToLight);
-//			if (shadowCheck.trace(new Color(), new Color()) > distanceToLight) {
+			Ray shadowCheck = new Ray(intersection, directionToLight);
+			double check = shadowCheck.trace(new Color(), new Color());
+			if (check > distanceToLight || check == -1) {
 				Vector directionOfReflectedRay = ((surfaceNormal.times(2*(directionToLight.dot(surfaceNormal)))).minus(directionToLight)).normalize();  // R in slides
 				if (surfaceNormal.dot(directionToLight) > 0) {
 					diffuse = diffuse.add((RayTracer.lights.get(i).color.times(sphere.material.Kd)).times(surfaceNormal.dot(directionToLight)));
@@ -85,7 +123,7 @@ public class Ray {
 				if (directionToCamera.dot(directionOfReflectedRay) > 0) {
 					specular = specular.add((RayTracer.lights.get(i).color.times(sphere.material.Ks)).times(Math.pow(directionToCamera.dot(directionOfReflectedRay), sphere.material.Ns)));
 				}
-//			}
+			}
 		}
 		sphereColor.set(ambient.add(diffuse).add(specular));
 	}
