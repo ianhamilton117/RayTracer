@@ -1,9 +1,15 @@
-#Spheres 
-s sphere1  0  0 -2  1 255    0    0
-s spehre2  0  0  2  1 255  100  100 
-s spehre3 -2  0  0  1   0  255    0
-s spehre4  2  0  0  1 100  255  100
-s sphere5  0 -2  0  1   0    0  255
-s sphere6  0  2  0  1 100  100  255
+mtllib model.mtl
+
+usemtl tomato
+s sphere1  0  0 -2  1
+s spehre2  0  0  2  1
+
+usemtl blue
+s spehre3 -2  0  0  1
+s spehre4  2  0  0  1
+
+usemtl springgreen
+s sphere5  0 -2  0  1
+s sphere6  0  2  0  1
 
 
