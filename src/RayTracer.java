@@ -14,6 +14,8 @@ import Jama.Matrix;
 
 public class RayTracer {
 	
+	public static boolean DEBUG = true;
+	
 	public static ArrayList<Sphere> spheres = new ArrayList<Sphere>();
 	public static LinkedList<Camera> cameras = new LinkedList<Camera>();
 	public static LinkedList<Light> lights = new LinkedList<Light>();

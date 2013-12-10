@@ -15,6 +15,9 @@ public class Face {
 		this.points = points;
 		this.material = material;
 		triangles = new LinkedList<Face>();
+/*		if (RayTracer.DEBUG == true) {
+			System.out.println(points);
+		}*/
 		triangulate();
 	}
 	
@@ -25,6 +28,11 @@ public class Face {
 		B = points.get(2).minus(points.get(1));
 		normal = A.cross(B).normalize();
 		d = -(normal.x*points.get(0).x + normal.y*points.get(0).y + normal.z*points.get(0).z);
+/*		if (RayTracer.DEBUG == true) {
+			System.out.println(points);
+			System.out.println(A);
+			System.out.println(B);
+		}*/
 	}
 	
 	private void triangulate() {
