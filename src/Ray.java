@@ -82,17 +82,17 @@ public class Ray {
 					try {
 						Matrix result = matrix1.inverse().times(matrix2);
 						double insideCheck = result.get(0, 0) + result.get(1, 0);
-						if (insideCheck <= 1 && insideCheck > 0) {
+						if (insideCheck <= 1 && insideCheck > 0 && result.get(0, 0) >= 0 && result.get(1, 0) >= 0) {
 							double intersection = t;
 							if (intersection >= pixelToPrpDist && (intersection < nearestTriangleIntersection || nearestTriangleIntersection == -1)) {
 								nearestTriangleIntersection = intersection;
 								triangleFinal = triangle;
+								System.out.println("Poo");
 								color.setAll(150);
-								print(triangleFinal.normal.toString());
 							}
 						}
 					} catch (RuntimeException e) {
-//						System.err.println("Singular matrix");
+						// Singular matrix
 					}
 				}
 			}
@@ -136,11 +136,5 @@ public class Ray {
 /*	private double nearestIntersection() {
 		
 	}*/
-	
-	private void print(String str) {
-		if (RAY_DEBUG == true) {
-			System.out.println(str);
-		}
-	}
 	
 }
