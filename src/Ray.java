@@ -3,6 +3,8 @@ import Jama.Matrix;
 
 public class Ray {
 	
+	public static boolean RAY_DEBUG = false;
+	
 	Vector direction;
 	Vector origin;
 	Vector prp;
@@ -33,8 +35,10 @@ public class Ray {
 	}
 	
 	public double trace(Color color, Color depth) {
+		
 		color.setAll(DEFAULT_COLOR);		// Default color if no intersection is found
 		depth.setAll(0);		// Default depth if no intersection is found
+		
 		double nearestSphereIntersection = -1;
 		Sphere sphereFinal = null;
 		double vFinal = 0;
@@ -78,16 +82,17 @@ public class Ray {
 					try {
 						Matrix result = matrix1.inverse().times(matrix2);
 						double insideCheck = result.get(0, 0) + result.get(1, 0);
-						if (insideCheck <= 1 && insideCheck > 0) {
+						if (insideCheck <= 1 && insideCheck > 0 && result.get(0, 0) >= 0 && result.get(1, 0) >= 0) {
 							double intersection = t;
 							if (intersection >= pixelToPrpDist && (intersection < nearestTriangleIntersection || nearestTriangleIntersection == -1)) {
 								nearestTriangleIntersection = intersection;
 								triangleFinal = triangle;
+								System.out.println("Poo");
 								color.setAll(150);
 							}
 						}
 					} catch (RuntimeException e) {
-//						System.err.println("Singular matrix");
+						// Singular matrix
 					}
 				}
 			}
@@ -131,5 +136,5 @@ public class Ray {
 /*	private double nearestIntersection() {
 		
 	}*/
-				
+	
 }
