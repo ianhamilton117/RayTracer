@@ -13,7 +13,6 @@ public class Camera {
 		prp = new Vector(prp_x, prp_y, prp_z, 1);
 		vpn = new Vector(vpn_x, vpn_y, vpn_z);
 		vpn = vpn.normalize();
-//		System.out.println(vpn);
 //		lookAt(new Vector(0, 0, 0));	// For testing. Comment out for regular use.
 		vup = new Vector(vup_x, vup_y, vup_z);
 		near = nearArg;
