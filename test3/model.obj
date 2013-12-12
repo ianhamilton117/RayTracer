@@ -22,4 +22,4 @@ f 5 6 2 1
 f 2 6 7 3
 
 usemtl orange
-s sphere_01 0 0 0 1
+s sphere_01 0 0 0 1.05

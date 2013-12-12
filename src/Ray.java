@@ -52,7 +52,7 @@ public class Ray {
 			double r = sphere.radius;
 			if (b <= r) {
 				double d = Math.sqrt(r*r - b*b);
-				double intersection = v-d;
+				double intersection = v-d;  // intersection is the distance from the prp to the point of intersection
 				if (intersection >= pixelToPrpDist && (intersection < nearestSphereIntersection || nearestSphereIntersection == -1)) {
 					nearestSphereIntersection = intersection;
 					sphereFinal = sphere;
@@ -63,7 +63,7 @@ public class Ray {
 		}
 		
 		double nearestTriangleIntersection = -1;
-		double t = 0;
+		double t = 0;  // t will be the distance from the PIXEL to the point of intersection
 		Face triangleFinal = null;
 		for (int i=0; i<RayTracer.groups.size(); ++i) {
 			Group group = RayTracer.groups.get(i);
@@ -84,11 +84,10 @@ public class Ray {
 						Matrix result = matrix1.inverse().times(matrix2);
 						double insideCheck = result.get(0, 0) + result.get(1, 0);
 						if (insideCheck <= 1 && insideCheck > 0 && result.get(0, 0) >= 0 && result.get(1, 0) >= 0) {
-							double intersection = t;
+							double intersection = t + pixelToPrpDist;  // intersection is the distance from the prp to the point of intersection
 							if (intersection >= pixelToPrpDist && (intersection < nearestTriangleIntersection || nearestTriangleIntersection == -1)) {
 								nearestTriangleIntersection = intersection;
 								triangleFinal = triangle;
-//								color.setAll(150);
 							}
 						}
 					} catch (RuntimeException e) {
@@ -97,27 +96,25 @@ public class Ray {
 				}
 			}
 		}
-		
-		if (RAY_DEBUG == true) {
-			System.out.println(nearestSphereIntersection + " " + nearestTriangleIntersection);
-		}
-		here
+
 		
 		// If the ray hit a sphere
 		if (nearestSphereIntersection != -1 && (nearestTriangleIntersection == -1 || nearestSphereIntersection <= nearestTriangleIntersection)) {
 			if (near != 0 || far != 0) {  // Don't enter if() if it's a shadow checker
 				Vector Q = prp.plus(direction.times(vFinal-dFinal));  // World coordinates where ray intersects sphere
 				setColor(color, sphereFinal, Q);
-				depth.setAll((int)Math.round(MAX_RGB_VALUE * (1 - (nearestSphereIntersection-pixelToPrpDist)/(far-near))));	// Corrected for distance from prp to image plane
+				depth.setAll((int)Math.round(MAX_RGB_VALUE * (1 - (nearestSphereIntersection-pixelToPrpDist)/(far-near))));	 // Corrected for distance from prp to image plane
 			}
 			return nearestSphereIntersection;
 		}
 		// If the ray hit a triangle
 		else if (nearestTriangleIntersection != -1 && (nearestSphereIntersection == -1 || nearestTriangleIntersection <= nearestSphereIntersection)) {
 			if (near != 0 || far != 0) {  // Don't enter if() if it's a shadow checker
-				Vector Q = prp.plus(direction.times(t));
-				color.setAll(150);
+				Vector Q = prp.plus(direction.times(t + pixelToPrpDist));
+				setColor(color, triangleFinal, Q);
+				depth.setAll((int)Math.round(MAX_RGB_VALUE * (1 - (nearestTriangleIntersection-pixelToPrpDist)/(far-near))));  // Corrected for distance from prp to image plane
 			}
+			return nearestTriangleIntersection;
 		}
 		return -1;
 	}
@@ -148,6 +145,10 @@ public class Ray {
 			}
 		}
 		sphereColor.set(ambient.add(diffuse).add(specular));
+	}
+	
+	private void setColor(Color triangleColor, Face triangle, Vector intersection) {
+		here
 	}
 	
 /*	private double nearestIntersection() {
