@@ -97,6 +97,12 @@ public class Ray {
 				}
 			}
 		}
+		
+		if (RAY_DEBUG == true) {
+			System.out.println(nearestSphereIntersection + " " + nearestTriangleIntersection);
+		}
+		here
+		
 		// If the ray hit a sphere
 		if (nearestSphereIntersection != -1 && (nearestTriangleIntersection == -1 || nearestSphereIntersection <= nearestTriangleIntersection)) {
 			if (near != 0 || far != 0) {  // Don't enter if() if it's a shadow checker
@@ -110,7 +116,7 @@ public class Ray {
 		else if (nearestTriangleIntersection != -1 && (nearestSphereIntersection == -1 || nearestTriangleIntersection <= nearestSphereIntersection)) {
 			if (near != 0 || far != 0) {  // Don't enter if() if it's a shadow checker
 				Vector Q = prp.plus(direction.times(t));
-				color.setAll(0);
+				color.setAll(150);
 			}
 		}
 		return -1;
