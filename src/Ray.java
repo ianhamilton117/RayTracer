@@ -71,6 +71,9 @@ public class Ray {
 				Face face = group.faces.get(j);
 				for (int k=0; k<face.triangles.size(); ++k) {
 					Face triangle = face.triangles.get(k);
+					/*if (triangle.normal.dot(triangle.points.get(0)) < 0) {
+						triangle.normal = triangle.normal.times(-1);
+					}*/
 					t = -((triangle.normal).dot(origin) + triangle.d) / (triangle.normal).dot(direction);
 					double[][] array1 = {{triangle.A.x, triangle.B.x, -direction.x},
 							             {triangle.A.y, triangle.B.y, -direction.y},
@@ -119,6 +122,7 @@ public class Ray {
 		return -1;
 	}
 	
+	// TODO some instances of prp may need to be replaced by origin or something for reflection or refraction rays
 	private void setColor(Color sphereColor, Sphere sphere, Vector intersection) {
 		// Ambient
 		Color ambient = new Color(RayTracer.lights.get(0).color.times(sphere.material.Ka));
@@ -148,7 +152,34 @@ public class Ray {
 	}
 	
 	private void setColor(Color triangleColor, Face triangle, Vector intersection) {
-		here
+		// Ambient
+		Color ambient = new Color(RayTracer.lights.get(0).color.times(triangle.material.Ka));
+		
+		// Diffuse and specular
+		Color diffuse = new Color();
+		Color specular = new Color();
+		Vector surfaceNormal = null;
+		Vector directionToCamera = (prp.minus(intersection)).normalize();
+		for (int i=1; i<RayTracer.lights.size(); ++i) {
+			double distanceToLight = RayTracer.lights.get(i).position.minus(intersection).length();
+			Vector directionToLight = (RayTracer.lights.get(i).position.minus(intersection)).normalize();
+			if (directionToLight.dot(triangle.normal) > 0)
+				surfaceNormal = triangle.normal;
+			else
+				surfaceNormal = triangle.normal.times(-1);
+			Ray shadowCheck = new Ray(intersection, directionToLight);
+			double check = shadowCheck.trace(new Color(), new Color());
+			if (check > distanceToLight || check == -1) {
+				Vector directionOfReflectedRay = ((surfaceNormal.times(2*(directionToLight.dot(surfaceNormal)))).minus(directionToLight)).normalize();  // TODO Maybe need to switch normal
+				if (surfaceNormal.dot(directionToLight) > 0) {
+					diffuse = diffuse.add((RayTracer.lights.get(i).color.times(triangle.material.Kd)).times(surfaceNormal.dot(directionToLight)));
+				}
+				if (directionToCamera.dot(directionOfReflectedRay) > 0) {
+					specular = specular.add((RayTracer.lights.get(i).color.times(triangle.material.Ks)).times(Math.pow(directionToCamera.dot(directionOfReflectedRay), triangle.material.Ns)));
+				}
+			}
+		}
+		triangleColor.set(ambient.add(diffuse).add(specular));
 	}
 	
 /*	private double nearestIntersection() {
