@@ -7,6 +7,7 @@ public class Face {
 	Material material;
 	LinkedList<Face> triangles;
 	Vector normal;
+	Vector correctedNormal;
 	Vector A;
 	Vector B;
 	double d;
