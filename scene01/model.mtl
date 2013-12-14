@@ -1,6 +1,6 @@
 # Alias Wavefront MTL File Exported from SketchUp
 # with OBJexporter (c) 2010-2012 TIG
-# You can ignore Ns,n1,Tr,Kr,Krf for this assignment. Just use Ka,Kd,Ks values.
+# Made for 'WITH_GIVEN_COLOR.obj'
 
 newmtl crimson
 Ka 1.000000000000 1.000000000000 1.000000000000
@@ -11,6 +11,17 @@ n1 1.000000000000
 Tr 1.000000000000
 Kr 1
 Krf 1
+
+newmtl my
+Ka 1.000000000000 1.000000000000 1.000000000000
+Kd 0.2 0.2 0.2
+Ks 1 1 1
+Ns 200
+n1 1.000000000000
+Tr 1.000000000000
+Kr 1
+Krf 1
+
 
 newmtl indigo
 Ka 1.000000000000 1.000000000000 1.000000000000
@@ -49,16 +60,6 @@ Ks 1 1 1
 Ns 100
 n1 1.000000000000
 Tr 1.000000000000
-Kr 1
-Krf 1
-
-newmtl  my
-Ka 1.000000000000 1.000000000000 1.000000000000
-Kd 0.1 0.5 1 
-Ks 1 1 1
-Ns 100
-n1 1.2
-Tr 0.8
 Kr 1
 Krf 1
 
@@ -103,3 +104,6 @@ Kr 1
 Krf 1
 
 
+
+
+#EOF

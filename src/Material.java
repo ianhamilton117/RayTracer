@@ -17,9 +17,9 @@ public class Material {
 		Ks = new Coefficient();
 		Ns = 1;  // Default to 1
 		n1 = 1;  // Default to 1
-		Tr = 1;  // Default to 1
-		Kr = 1;  // Default to 1
-		Krf = 1;  // Default to 1
+		Tr = 0;  // Default to 0
+		Kr = 0;  // Default to 0
+		Krf = 0;  // Default to 0
 	}
 	
 	public Material(String name, Coefficient Ka, Coefficient Kd, Coefficient Ks, 

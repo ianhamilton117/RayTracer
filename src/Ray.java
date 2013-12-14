@@ -13,17 +13,28 @@ public class Ray {
 	double far;
 	int recursionDepth;
 	private static final int MAX_RGB_VALUE = 255;
-	private static final int DEFAULT_COLOR = 255;
+	private static final int DEFAULT_COLOR = 0;
 
 	// Constructor for use with rays from camera
 	public Ray(Vector prp, Vector pixel, double nearArg, double farArg, int recursionDepth) {
 		this.prp = prp;
-		this.recursionDepth = recursionDepth; just added
+		this.recursionDepth = recursionDepth;
 		direction = (pixel.minus(prp)).normalize();
 		origin = pixel;
 		pixelToPrpDist = (pixel.minus(prp)).length();
 		near = nearArg;
 		far = farArg;
+	}
+	
+	// Constructor for use with reflected rays
+	public Ray(Vector origin, Vector direction, int recursionDepth) {
+		prp = origin;
+		this.origin = origin;
+		this.direction = direction;
+		pixelToPrpDist = 0;
+		near = 0;
+		far = 0;
+		this.recursionDepth = recursionDepth;
 	}
 	
 	// Constructor for use with shadow checking rays
@@ -155,7 +166,22 @@ public class Ray {
 				}
 			}
 		}
-		sphereColor.set(ambient.add(diffuse).add(specular));
+		
+		Color reflectionColor = new Color(0, 0, 0);
+		if (recursionDepth > 1) {
+			Vector reflectionDirection = ((surfaceNormal.times(2*(direction.times(-1).dot(surfaceNormal)))).minus(direction.times(-1))).normalize();
+			reflectionColor = new Color();
+			Color reflectionDepth = new Color();  // Junk object
+			Ray reflectionRay = new Ray(intersection, reflectionDirection, recursionDepth-1);
+			double distance = reflectionRay.trace(reflectionColor, reflectionDepth);
+			reflectionColor = reflectionColor.times(sphere.material.Kr);
+			if (distance == -1) {
+				reflectionColor.setAll(0);
+			}
+		}
+		else
+			reflectionColor.setAll(0);
+		sphereColor.set(ambient.add(diffuse).add(specular).add(reflectionColor));
 	}
 	
 	private void setColor(Color triangleColor, Face triangle, Vector intersection) {
