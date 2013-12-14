@@ -11,12 +11,14 @@ public class Ray {
 	double pixelToPrpDist;
 	double near;
 	double far;
+	int recursionDepth;
 	private static final int MAX_RGB_VALUE = 255;
 	private static final int DEFAULT_COLOR = 255;
 
 	// Constructor for use with rays from camera
-	public Ray(Vector prp, Vector pixel, double nearArg, double farArg) {
+	public Ray(Vector prp, Vector pixel, double nearArg, double farArg, int recursionDepth) {
 		this.prp = prp;
+		this.recursionDepth = recursionDepth; just added
 		direction = (pixel.minus(prp)).normalize();
 		origin = pixel;
 		pixelToPrpDist = (pixel.minus(prp)).length();
@@ -178,7 +180,8 @@ public class Ray {
 				Vector directionOfReflectedRay = ((surfaceNormal.times(2*(directionToLight.dot(surfaceNormal)))).minus(directionToLight)).normalize();  // TODO Maybe need to switch normal
 				if (surfaceNormal.dot(directionToLight) > 0) {
 					diffuse = diffuse.add((RayTracer.lights.get(i).color.times(triangle.material.Kd)).times(surfaceNormal.dot(directionToLight)));
-				} theres red in the green!!! Forget polygons for now though, do sphere reflection
+				} 
+				//TODO There's red in the green!!! (with shadowCheck commented out)
 				if (directionToCamera.dot(directionOfReflectedRay) > 0) {
 					specular = specular.add((RayTracer.lights.get(i).color.times(triangle.material.Ks)).times(Math.pow(directionToCamera.dot(directionOfReflectedRay), triangle.material.Ns)));
 				}
