@@ -1,0 +1,8 @@
+#Camera specifications
+c cam01 0 0 0 0 0 1 0 1 0 1 10
+
+#light sources
+l 10 0 10 1 150 150 150
+
+#ray cast command
+r scene_01 512 512 1

@@ -1,0 +1,8 @@
+# cube.obj
+#a cube, defined in terms of rectangels (not triangles)
+
+mtllib model.mtl
+usemtl crimson
+s sphere_00 5 0 5 0.5
+usemtl orange
+s sphere_01 0 0 0 2
