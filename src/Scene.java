@@ -10,6 +10,8 @@ public class Scene {
 	private Color[][] colorMap;
 	private Color[][] depthMap;
 	
+	private static final int MAX_RGB_VALUE = 255;
+	
 	public Scene(String nameArg, int image_widthArg, int image_heightArg, int recursion_depthArg) {
 		
 		name = nameArg;
@@ -31,14 +33,21 @@ public class Scene {
 		initializeImagePlane(camera);
 		for (int j = 0; j < image_height; j++) {
 			for (int i = 0; i < image_width; i++) {
-				Ray ray = new Ray(camera.prp, imagePlane[i][j], camera.near, camera.far, recursion_depth);
+				Vector direction = imagePlane[i][j].minus(camera.prp);
+				Ray ray = new Ray(camera.prp, direction, recursion_depth);
 				if (RayTracer.DEBUG == true) {
 					if (i == 439 && j == 1024/2)
 						Ray.RAY_DEBUG = true;
 					else
 						Ray.RAY_DEBUG = false;
 				}
-				ray.trace(colorMap[i][j], depthMap[i][j]);
+				double distance = ray.trace(colorMap[i][j]);
+				if (distance == -1) {
+					depthMap[i][j].setAll(0);
+				}
+				else {
+					depthMap[i][j].setAll((int)Math.round(MAX_RGB_VALUE * (1 - (distance)/(camera.far-camera.near))));
+				}
 			}
 		}
 	}

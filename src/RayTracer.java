@@ -14,11 +14,11 @@ import Jama.Matrix;
 
 public class RayTracer {
 	
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	public static ArrayList<Sphere> spheres = new ArrayList<Sphere>();
 	public static LinkedList<Camera> cameras = new LinkedList<Camera>();
-	public static LinkedList<Light> lights = new LinkedList<Light>();
+	public static LinkedList<Light> lights = new LinkedList<Light>();  // lights[0] will have the ambient light
 	public static LinkedList<Scene> scenes = new LinkedList<Scene>();
 	public static ArrayList<Vector> vertices = new ArrayList<Vector>();
 	public static ArrayList<Group> groups = new ArrayList<Group>();
