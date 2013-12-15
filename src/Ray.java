@@ -13,7 +13,7 @@ public class Ray {
 	double far;
 	int recursionDepth;
 	private static final int MAX_RGB_VALUE = 255;
-	private static final int DEFAULT_COLOR = 0;
+	private static final int DEFAULT_COLOR = 255;
 
 	// Constructor for use with rays from camera
 	public Ray(Vector prp, Vector pixel, double nearArg, double farArg, int recursionDepth) {
@@ -48,6 +48,12 @@ public class Ray {
 	}
 	
 	public double trace(Color color, Color depth) {
+		
+		if (RAY_DEBUG == true) {
+			int i = 1;
+			if(1==i){}  // Just here to get a breakpoint for debugging
+//			System.out.println("poo");
+		}
 		
 		color.setAll(DEFAULT_COLOR);		// Default color if no intersection is found
 		depth.setAll(0);		// Default depth if no intersection is found
@@ -182,6 +188,10 @@ public class Ray {
 		else
 			reflectionColor.setAll(0);
 		sphereColor.set(ambient.add(diffuse).add(specular).add(reflectionColor));
+		
+		if (RAY_DEBUG == true) {
+			sphereColor.setAll(0);
+		}
 	}
 	
 	private void setColor(Color triangleColor, Face triangle, Vector intersection) {

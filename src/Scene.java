@@ -32,13 +32,13 @@ public class Scene {
 		for (int j = 0; j < image_height; j++) {
 			for (int i = 0; i < image_width; i++) {
 				Ray ray = new Ray(camera.prp, imagePlane[i][j], camera.near, camera.far, recursion_depth);
-/*				if (RayTracer.DEBUG == true) {
-					if (i == 512/2 && j == 512/2)
+				if (RayTracer.DEBUG == true) {
+					if (i == 439 && j == 1024/2)
 						Ray.RAY_DEBUG = true;
 					else
 						Ray.RAY_DEBUG = false;
 				}
-*/				ray.trace(colorMap[i][j], depthMap[i][j]);
+				ray.trace(colorMap[i][j], depthMap[i][j]);
 			}
 		}
 	}
