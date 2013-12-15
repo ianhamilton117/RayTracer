@@ -50,7 +50,6 @@ public class Ray {
 		}
 		
 		double nearestTriangleDistance = -1;
-		double t = 0;  // The scalar that gets multiplied on to the direction vector to give it length
 		Face triangleFinal = null;
 		Vector triangleNormalFinal = null;
 		for (int i=0; i<RayTracer.groups.size(); ++i) {
@@ -62,7 +61,6 @@ public class Ray {
 					Vector triangleNormal = triangle.normal;
 					if (direction.dot(triangleNormal) > 0)
 						triangleNormal = triangleNormal.times(-1);  // Ensure the normal is pointed towards the viewer
-					t = -((triangleNormal).dot(origin) + triangle.d) / (triangleNormal).dot(direction);
 					double[][] array1 = {{triangle.A.x, triangle.B.x, -direction.x},
 							             {triangle.A.y, triangle.B.y, -direction.y},
 							             {triangle.A.z, triangle.B.z, -direction.z}};
@@ -72,16 +70,11 @@ public class Ray {
 					Matrix matrix1 = new Matrix(array1);
 					Matrix matrix2 = new Matrix(array2);
 					try {
-						Matrix result = matrix1.inverse().times(matrix2);
-						if (Math.abs(t - result.get(2, 0)) > 0.00001) {  // Ensure that t is the same when calculated different ways
-							System.err.println("Error: t values don't match: ");
-							System.err.println(t);
-							System.err.println(result.get(2, 0) + '\n');
-						}
+						Matrix result = matrix1.inverse().times(matrix2);  // result = [beta, gamma, t] (see slides)
 						double insideCheck = result.get(0, 0) + result.get(1, 0);
 						if (insideCheck <= 1 && insideCheck > 0 && result.get(0, 0) >= 0 && result.get(1, 0) >= 0) {  // If the ray hit the triangle
-							double distance = t;  // The distance from the origin to the point of intersection (distance the ray traveled)
-							if (distance >= 0 && (distance < nearestTriangleDistance || nearestTriangleDistance == -1)) {  // If nearest intersection so far (and triangel not behind ray)
+							double distance = result.get(2, 0);  // The distance from the origin to the point of intersection (distance the ray traveled)
+							if (distance >= 0.00000000000001 && (distance < nearestTriangleDistance || nearestTriangleDistance == -1)) {  // If nearest intersection so far (and triangle not behind ray)
 								nearestTriangleDistance = distance;
 								triangleFinal = triangle;
 								triangleNormalFinal = triangleNormal;

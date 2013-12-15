@@ -42,7 +42,7 @@ public class Scene {
 						Ray.RAY_DEBUG = false;
 				}
 				double distance = ray.trace(colorMap[i][j]);
-				if (distance == -1) {
+				if (distance == -1 || distance > camera.far - camera.near) {
 					depthMap[i][j].setAll(0);
 				}
 				else {
