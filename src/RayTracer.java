@@ -15,6 +15,7 @@ import Jama.Matrix;
 public class RayTracer {
 	
 	public static boolean DEBUG = false;
+	public static boolean ENABLE_DEPTH_MAP = false;
 
 	public static ArrayList<Sphere> spheres = new ArrayList<Sphere>();
 	public static LinkedList<Camera> cameras = new LinkedList<Camera>();
@@ -34,7 +35,8 @@ public class RayTracer {
 			String colorFile = (scenes.get(s).name + "_" + cameras.get(c).name + "_color.ppm");
 			String depthFile = (scenes.get(s).name + "_" + cameras.get(c).name + "_depth.ppm");
 			write(colorMap, colorFile);
-			write(depthMap, depthFile);
+			if (ENABLE_DEPTH_MAP)
+				write(depthMap, depthFile);
 			}
 		}
 		System.out.println("Done");

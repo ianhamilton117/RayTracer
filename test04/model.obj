@@ -1,0 +1,14 @@
+# Alias Wavefront OBJ File Exported from SketchUp
+# with OBJexporter (c) 2010-2012 TIG
+# Units = meters
+
+mtllib model.mtl
+
+usemtl glass
+s sphere_1 0 -1 0 1
+
+usemtl Default_Material
+s sphere_2 1 0 -8 1
+usemtl Default_Material1
+s sphere_3 1 -2 -8 1
+

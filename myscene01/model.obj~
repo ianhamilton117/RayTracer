@@ -1,0 +1,27 @@
+# cube.obj
+#a cube, defined in terms of rectangels (not triangles)
+
+mtllib model.mtl
+
+v -100 0 -80
+v -100 100 -80
+v 100 100 -80
+v 100 0 -80
+
+v -100 -100 -80
+v 100 -100 -80
+
+usemtl crimson
+g redWall
+f 1 2 3 4
+
+usemtl blue
+g blueWall
+f 1 4 6 5
+
+usemtl glass
+s sphere_01 0 0 3 1
+s sphere_01 0 0 -5 1
+s sphere_01 0 0 -17 1
+usemtl springgreen
+s sphere_01 9 9 -25 5
